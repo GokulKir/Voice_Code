@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
   NativeEventEmitter,
-  NativeModules,
+   NativeModules,
   useWindowDimensions
 } from "react-native";
 import React, { useEffect, useState } from 'react'
@@ -18,6 +18,7 @@ import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import Icon1 from 'react-native-vector-icons/dist/MaterialIcons';
 import Icon2 from 'react-native-vector-icons/dist/Ionicons';
 import Tts from 'react-native-tts';
+import { AlanView , alanBtn } from '@alan-ai/alan-sdk-react-native';
 import { Modal, Portal, Provider, TouchableRipple } from 'react-native-paper';
 import {
   responsiveHeight,
@@ -29,15 +30,87 @@ import {
 } from 'react-native-indicators';
 import firestore from '@react-native-firebase/firestore';
 import Voice from '@react-native-community/voice';
-
+import { useNavigation } from "@react-navigation/native";
+import { Item } from "react-native-paper/lib/typescript/src/components/Drawer/Drawer";
 
 export default function App() {
+  const navigation = useNavigation()
   const [visible, setVisible] = useState(false);
   const [result, setResult] = useState()
   const [error, setError] = useState()
   const [IsRecording, setIsRecording] = useState(false)
+  const [command , setCommand]  = useState()
 
   const { height, width } = useWindowDimensions()
+
+
+  const [responseText, setResponseText] = useState('');
+
+ const {AlanManager} = NativeModules ;
+
+ const {AlanEventEmitter} = NativeModules ;
+
+ const alanEventEmitter = new  NativeEventEmitter(AlanEventEmitter) ;
+
+
+
+
+
+ function handleCommand(commandData) {
+  console.log('*****' , commandData);
+  
+  const { command } = commandData;
+  console.log(command);
+  
+  if (command === 'send-message') {
+    const message = commandData.data.message;
+ 
+  }
+}
+  
+  // if (commandData.command === 'get_data') {
+  //   const endpoint = 'data';
+  //   const method = 'GET';
+  //   sendApiRequest(endpoint, method)
+  //     .then(data => {
+  //       alanBtn.playText(`Here is the data: ${JSON.stringify(data)}`);
+  //     });
+  // } else if (commandData.command === 'post_data') {
+  //   const endpoint = 'data';
+  //   const method = 'POST';
+  //   const data = {
+  //     name: commandData.data.name,
+  //     age: commandData.data.age
+  //   };
+  //   sendApiRequest(endpoint, method, data)
+  //     .then(data => {
+  //       alanBtn.playText(`Data posted: ${JSON.stringify(data)}`);
+  //     });
+  // }
+
+
+
+ useEffect(() => {
+   
+  console.log(alanBtn);
+  
+
+ })
+
+  // const handleCommand = (command) => {
+  //   console.log('Received command:', command);
+  //   setCommand(command)
+  //   // Get the voice response from Alan AI
+  //   const { data: { output: { text } } } = command;
+  //   // Convert the voice response to text and set the state
+  //   setResponseText(text);
+  //   console.log("_______+++++++",responseText);
+    
+  //   // Play the voice response as text
+  //   alanBtn.playText(text);
+  // };
+
+
 
   Voice.onSpeechStart = () => setIsRecording(true)
   Voice.onSpeechEnd = () => setIsRecording(false)
@@ -48,7 +121,7 @@ export default function App() {
   /*/Record Started /*/
 
   const startRecording = async () => {
-
+    console.log(command);    
     try {
       showModal()
       await Voice.start('en-US')
@@ -99,6 +172,7 @@ export default function App() {
     
     
   })
+  
 
 
 
@@ -126,6 +200,12 @@ export default function App() {
     console.log('TTS started for utterance ID:', utteranceId);
   });
 
+
+  const MyComponent = () => {
+  const handleClick = () => {
+    alanBtn.playText('Hello, Alan!');
+  };
+}
 
 
 
@@ -246,6 +326,7 @@ export default function App() {
   };
 
 
+
   const MyModal = () => {
     return (
       <Provider>
@@ -259,7 +340,7 @@ export default function App() {
 
             <BarIndicator color='white' size={34} />
 
-
+          
             <View style={{ alignItems: 'center', top: 0 }}>
 
 
@@ -280,11 +361,11 @@ export default function App() {
       {visible == true ? <MyModal /> : null}
 
      
-      {   result   ?
-      <View style={{alignItems:'center' , justifyContent:'center'  , borderWidth : 1 , borderColor:'#fff' ,  padding : 0  , borderRadius : 100}}>
-        <Text style={{ color: '#fff' }}>{result}</Text>
+     
+      {/* <View style={{alignItems:'center' , justifyContent:'center'  , borderWidth : 1 , borderColor:'#fff' ,  padding : 0  , borderRadius : 100}}>
+        <Text style={{ color: '#fff' }}>{responseText}</Text>
         </View>
-        : null}
+       */}
 
       <View style={styles.container}>
         <View style={{ flex: 1, justifyContent: "center" }}>
@@ -297,6 +378,8 @@ export default function App() {
 
         </View>
 
+        <AlanView projectid={'24be8d34ed3c7709c04b55f31754182e2e956eca572e1d8b807a3e2338fdd0dc/stage'}  onCommand={handleCommand}
+            wakewordEnabled={true}  />
 
         <View
           style={{
@@ -328,7 +411,7 @@ export default function App() {
               value={inputMessage}
               placeholderTextColor="#000"
             />
-            <TouchableOpacity onPress={() => startRecording()}>
+            <TouchableOpacity onPress={() => MyComponent()}>
               <Icon1 style={{ top: 3, left: -5 }} name="keyboard-voice" size={29} color="#000" />
             </TouchableOpacity>
           </View>

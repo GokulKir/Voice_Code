@@ -5,6 +5,9 @@ import App from "./App";
 import { NativeBaseProvider, Box } from "native-base";
 import { Provider as PaperProvider } from 'react-native-paper';
 
+
+
+
 export default function Main() {
   return (
   <PaperProvider>
